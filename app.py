@@ -1,76 +1,142 @@
 import streamlit as st
 from dotenv import load_dotenv
-
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
 load_dotenv()
 
 st.set_page_config(
-    page_title="Credit Card Assistant",
-    page_icon="💳"
+    page_title="Credit Card AI Assistant",
+    page_icon="💳",
+    layout="wide"
 )
 
-st.title("Credit Card AI Assistant")
-st.write("This is an AI Credit Card Assistant, this bot will be useful")
+# ---------------- Sidebar ----------------
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=100)
+    st.title("💳 Credit Card AI")
+    st.write("Your Smart Credit Card Assistant")
 
-st.write("Ask anything related to credit cards")
+    st.markdown("---")
+
+    st.subheader("Topics Covered")
+
+    st.markdown("""
+    ✅ Credit Card Features
+
+    ✅ Rewards & Cashback
+
+    ✅ Credit Score
+
+    ✅ EMI
+
+    ✅ Billing Cycle
+
+    ✅ Interest Rate
+
+    ✅ Card Security
+
+    ✅ Online Payments
+
+    ✅ Fees & Charges
+    """)
+
+    st.markdown("---")
+    st.caption("Powered by Groq + Llama 3.1")
+
+# ---------------- Main Page ----------------
+
+st.title("💳 Credit Card AI Assistant")
+
+st.markdown(
+"""
+Welcome!
+
+This AI Assistant answers **only Credit Card related questions**.
+
+Ask anything about:
+
+- Credit Cards
+- Rewards
+- Cashback
+- Credit Score
+- EMI
+- Billing Cycle
+- Security
+- Online Payments
+"""
+)
 
 question = st.text_area(
-    "Enter Your Credit Card Question"
+    "Enter your question",
+    placeholder="Example: What is minimum payment on a credit card?"
 )
 
-if st.button("Ask AI"):
+if st.button("🚀 Ask AI", use_container_width=True):
+
+    if question.strip() == "":
+        st.warning("Please enter a question.")
+        st.stop()
+
     llm = ChatGroq(
         model="llama-3.1-8b-instant",
         temperature=0.3
-
     )
 
     prompt = ChatPromptTemplate.from_template(
-        """
-        You are a Credit Card Expert.
-        Your job is to answer ONLY credit card-related questions.
+    """
+    You are an expert Credit Card Advisor.
 
-        Topics include:
-        - Credit Card Features
-        - Credit Card Eligibility
-        - Credit Card Benefits
-        - Rewards & Cashback
-        - Credit Limit
-        - Interest Rates
-        - Billing Cycle
-        - Minimum Payment
-        - EMI on Credit Cards
-        - Credit Score
-        - Fees & Charges
-        - Safe Credit Card Usage
-        - Card Security
-        - Online Transactions
-        - Credit Card Statements
+    Answer ONLY credit card related questions.
 
-        If the user asks anything outside credit cards,
-        reply:
+    Topics:
+    - Eligibility
+    - Benefits
+    - Rewards
+    - Cashback
+    - Credit Score
+    - Interest
+    - EMI
+    - Billing Cycle
+    - Security
+    - Statements
+    - Fees
+    - Online Transactions
 
-        "Sorry, I only answer credit card-related questions."
+    If the question is unrelated, reply:
 
-        Question:
-        {question}
+    Sorry, I only answer credit card-related questions.
 
-        Provide:
-        1. Simple Explanation
-        2. Step-by-step guidance
-        3. Best Practices
-        4. Precautions if needed
-        """
+    Question:
+    {question}
+
+    Format your answer using:
+
+    ## Simple Explanation
+
+    ## Step-by-Step Guidance
+
+    ## Best Practices
+
+    ## Precautions (if needed)
+    """
     )
 
     chain = prompt | llm
 
-    response = chain.invoke(
-        {
-            "question": question
-        }
-    )
+    with st.spinner("Generating answer..."):
 
-    st.success(response.content)
+        response = chain.invoke(
+            {
+                "question": question
+            }
+        )
+
+    st.success("Answer Generated Successfully!")
+
+    st.markdown("## 🤖 AI Response")
+
+    st.info(response.content)
+
+st.markdown("---")
+st.caption("© 2026 Credit Card AI Assistant | Built with Streamlit + LangChain + Groq")
