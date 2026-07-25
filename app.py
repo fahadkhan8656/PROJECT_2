@@ -201,7 +201,7 @@ with st.sidebar:
 # ---------------- HERO HEADER ----------------
 st.markdown("""
 <div class="hero-card">
-    <div class="hero-title">💳 Credit Card AI Advisor</div>
+    <div class="hero-title">💳 Credit Card Information Chatbot Using AI</div>
     <div class="hero-subtitle">Ask anything about credit scores, cashback tricks, EMI math, fees, and smart habits. Get direct, simple, expert answers.</div>
 </div>
 """, unsafe_allow_html=True)
