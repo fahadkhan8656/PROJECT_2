@@ -11,72 +11,118 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------- Sidebar ----------------
+# ---------------- CUSTOM CSS ----------------
+
+st.markdown("""
+<style>
+
+.main{
+    background-color:#f5f7fa;
+}
+
+.stChatMessage{
+    border-radius:15px;
+}
+
+h1{
+    color:#0E4D92;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------- SIDEBAR ----------------
+
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=100)
+
     st.title("💳 Credit Card AI")
-    st.write("Your Smart Credit Card Assistant")
 
-    st.markdown("---")
+    st.write("Your Personal Credit Card Expert")
 
-    st.subheader("Topics Covered")
+    st.divider()
 
-    st.markdown("""
-    ✅ Credit Card Features
+    st.subheader("📚 Topics")
 
-    ✅ Rewards & Cashback
+    st.write("""
+✅ Credit Card Features
 
-    ✅ Credit Score
+✅ Rewards & Cashback
 
-    ✅ EMI
+✅ Credit Score
 
-    ✅ Billing Cycle
+✅ EMI
 
-    ✅ Interest Rate
+✅ Billing Cycle
 
-    ✅ Card Security
+✅ Interest Rate
 
-    ✅ Online Payments
+✅ Minimum Payment
 
-    ✅ Fees & Charges
-    """)
+✅ Security
 
-    st.markdown("---")
+✅ Online Transactions
+
+✅ Fees & Charges
+""")
+
+    st.divider()
+
+    if st.button("🗑 Clear Chat"):
+        st.session_state.messages = []
+        st.rerun()
+
+    st.divider()
+
     st.caption("Powered by Groq + Llama 3.1")
 
-# ---------------- Main Page ----------------
+# ---------------- TITLE ----------------
 
 st.title("💳 Credit Card AI Assistant")
 
-st.markdown(
+st.write(
 """
 Welcome!
 
-This AI Assistant answers **only Credit Card related questions**.
+Ask anything related to **Credit Cards**.
 
-Ask anything about:
+Examples:
 
-- Credit Cards
-- Rewards
-- Cashback
-- Credit Score
-- EMI
-- Billing Cycle
-- Security
-- Online Payments
+• What is Credit Score?
+
+• What is Minimum Payment?
+
+• How does EMI work?
+
+• Which card gives best cashback?
+
 """
 )
 
-question = st.text_area(
-    "Enter your question",
-    placeholder="Example: What is minimum payment on a credit card?"
-)
+# ---------------- CHAT HISTORY ----------------
 
-if st.button("🚀 Ask AI", use_container_width=True):
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    if question.strip() == "":
-        st.warning("Please enter a question.")
-        st.stop()
+for message in st.session_state.messages:
+
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# ---------------- USER INPUT ----------------
+
+question = st.chat_input("Ask your Credit Card Question...")
+
+if question:
+
+    st.session_state.messages.append(
+        {
+            "role":"user",
+            "content":question
+        }
+    )
+
+    with st.chat_message("user"):
+        st.markdown(question)
 
     llm = ChatGroq(
         model="llama-3.1-8b-instant",
@@ -84,59 +130,84 @@ if st.button("🚀 Ask AI", use_container_width=True):
     )
 
     prompt = ChatPromptTemplate.from_template(
-    """
-    You are an expert Credit Card Advisor.
+"""
+You are a Professional Credit Card Advisor.
 
-    Answer ONLY credit card related questions.
+Answer ONLY Credit Card related questions.
 
-    Topics:
-    - Eligibility
-    - Benefits
-    - Rewards
-    - Cashback
-    - Credit Score
-    - Interest
-    - EMI
-    - Billing Cycle
-    - Security
-    - Statements
-    - Fees
-    - Online Transactions
+Topics include:
 
-    If the question is unrelated, reply:
+- Credit Card Features
 
-    Sorry, I only answer credit card-related questions.
+- Eligibility
 
-    Question:
-    {question}
+- Rewards
 
-    Format your answer using:
+- Cashback
 
-    ## Simple Explanation
+- Credit Limit
 
-    ## Step-by-Step Guidance
+- Interest Rate
 
-    ## Best Practices
+- Billing Cycle
 
-    ## Precautions (if needed)
-    """
+- Minimum Payment
+
+- EMI
+
+- Credit Score
+
+- Security
+
+- Online Transactions
+
+- Statements
+
+- Fees & Charges
+
+If the question is outside credit cards reply exactly:
+
+Sorry, I only answer credit card-related questions.
+
+Question:
+
+{question}
+
+Answer using this format:
+
+# 📘 Simple Explanation
+
+# 📌 Step-by-Step Guidance
+
+# ✅ Best Practices
+
+# ⚠ Precautions (if needed)
+
+Keep the answer simple and beginner friendly.
+"""
     )
 
     chain = prompt | llm
 
-    with st.spinner("Generating answer..."):
+    with st.chat_message("assistant"):
 
-        response = chain.invoke(
-            {
-                "question": question
-            }
-        )
+        with st.spinner("Thinking..."):
 
-    st.success("Answer Generated Successfully!")
+            response = chain.invoke(
+                {
+                    "question":question
+                }
+            )
 
-    st.markdown("## 🤖 AI Response")
+            st.markdown(response.content)
 
-    st.info(response.content)
+    st.session_state.messages.append(
+        {
+            "role":"assistant",
+            "content":response.content
+        }
+    )
 
-st.markdown("---")
-st.caption("© 2026 Credit Card AI Assistant | Built with Streamlit + LangChain + Groq")
+st.divider()
+
+st.caption("© 2026 Credit Card AI Assistant | Built with Streamlit • LangChain • Groq")
