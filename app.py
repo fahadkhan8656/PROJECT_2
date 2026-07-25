@@ -7,7 +7,7 @@ load_dotenv()
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
-    page_title="Credit Card AI Advisor",
+    page_title="Credit Card Information Chatbot Using AI",
     page_icon="💳",
     layout="wide",
     initial_sidebar_state="expanded"
